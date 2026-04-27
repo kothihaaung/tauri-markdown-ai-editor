@@ -36,8 +36,13 @@
     const saved = localStorage.getItem("brain-notes");
     if (saved) {
       try {
-        notes = JSON.parse(saved);
-        if (notes.length > 0) activeNoteId = notes[0].id;
+        const parsed = JSON.parse(saved);
+        if (parsed && parsed.length > 0) {
+          notes = parsed;
+          activeNoteId = notes[0].id;
+        } else {
+          createNewNote();
+        }
       } catch (e) {
         console.error("Failed to load notes", e);
         createNewNote();
@@ -71,12 +76,14 @@
         content: activeNote.content 
       });
       
-      // Update the active note in the list
+      // Update the note in the list
       const index = notes.findIndex(n => n.id === activeNoteId);
       if (index !== -1) {
         notes[index].title = result.title;
         notes[index].summary = result.summary;
         notes[index].updatedAt = Date.now();
+        // Trigger re-assignment for deep reactivity if needed (though runes handle objects)
+        notes = [...notes];
       }
     } catch (err) {
       console.error("AI Error:", err);
@@ -100,7 +107,17 @@
 
   function deleteNote(id: string, event: MouseEvent) {
     event.stopPropagation();
-    if (notes.length <= 1) return;
+    if (notes.length <= 1) {
+        // Just clear the note instead of deleting the last one
+        const index = notes.findIndex(n => n.id === id);
+        if (index !== -1) {
+            notes[index].content = "";
+            notes[index].title = "Untitled Note";
+            notes[index].summary = "";
+            notes[index].updatedAt = Date.now();
+        }
+        return;
+    }
     notes = notes.filter(n => n.id !== id);
     if (activeNoteId === id) {
       activeNoteId = notes[0].id;
@@ -172,19 +189,16 @@
   <!-- Main Content -->
   <main class="flex-1 flex flex-col min-w-0 relative">
     <header class="h-16 border-b border-white/5 flex items-center justify-between px-6 backdrop-blur-md bg-black/20 z-10">
-      <div class="flex flex-col min-w-0">
+      <div class="flex flex-col min-w-0 flex-1 mr-4">
         <input 
           value={activeNote?.title}
           oninput={(e) => {
             const index = notes.findIndex(n => n.id === activeNoteId);
             if (index !== -1) notes[index].title = e.currentTarget.value;
           }}
-          class="bg-transparent border-none text-white font-medium text-sm tracking-tight focus:outline-none w-full"
+          class="bg-transparent border-none text-white font-medium text-lg tracking-tight focus:outline-none w-full"
           placeholder="Note Title"
         />
-        {#if activeNote?.summary}
-          <span class="text-[10px] text-zinc-500 uppercase tracking-widest truncate max-w-md">{activeNote.summary}</span>
-        {/if}
       </div>
       
       <div class="flex items-center gap-2">
@@ -220,20 +234,37 @@
       </div>
     </header>
 
-    <section class="flex-1 overflow-y-auto bg-[#050505]">
-      <div class="max-w-4xl mx-auto min-h-full p-12">
-        {#if isPreview}
-          <article class="prose prose-invert prose-zinc max-w-none prose-headings:text-white prose-a:text-indigo-400">
-            {@html marked(activeNote?.content || "")}
-          </article>
-        {:else}
-          <Textarea 
-            value={activeNote?.content}
-            oninput={(e) => updateContent(e.currentTarget.value)}
-            placeholder="Start writing in Markdown..."
-            class="w-full h-[calc(100vh-200px)] bg-transparent border-none focus-visible:ring-0 text-lg leading-relaxed text-zinc-200 resize-none placeholder:text-zinc-800 p-0"
-          />
+    <section class="flex-1 overflow-y-auto bg-[#050505] p-8">
+      <div class="max-w-4xl mx-auto space-y-6">
+        {#if activeNote?.summary}
+          <div 
+            in:fade
+            class="p-4 bg-indigo-500/5 border border-indigo-500/20 rounded-xl text-zinc-400 text-sm leading-relaxed flex gap-3"
+          >
+            <div class="mt-0.5 text-indigo-400 shrink-0">
+              <Sparkles size={16} />
+            </div>
+            <div>
+              <span class="text-[10px] uppercase tracking-[0.2em] text-indigo-400/60 font-bold block mb-1">AI Summary</span>
+              {activeNote.summary}
+            </div>
+          </div>
         {/if}
+
+        <div class="min-h-[500px]">
+          {#if isPreview}
+            <article class="prose prose-invert prose-zinc max-w-none prose-headings:text-white prose-a:text-indigo-400">
+              {@html marked(activeNote?.content || "")}
+            </article>
+          {:else}
+            <Textarea 
+              value={activeNote?.content}
+              oninput={(e) => updateContent(e.currentTarget.value)}
+              placeholder="Start writing in Markdown..."
+              class="w-full h-full bg-transparent border-none focus-visible:ring-0 text-lg leading-relaxed text-zinc-200 resize-none placeholder:text-zinc-800 p-0 min-h-[70vh]"
+            />
+          {/if}
+        </div>
       </div>
     </section>
 

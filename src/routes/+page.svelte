@@ -95,7 +95,7 @@
   function deleteNote(id: string, event: MouseEvent) {
     event.stopPropagation();
     if (notes.length <= 1) {
-      const index = notes.findIndex(n => n.id === id);
+      const index = notes.findIndex((n) => n.id === id);
       if (index !== -1) {
         notes[index].title = "Untitled Note";
         notes[index].content = "";
@@ -109,7 +109,9 @@
   }
 </script>
 
-<div class="h-screen w-full bg-[#050505] text-zinc-400 font-inter flex overflow-hidden">
+<div
+  class="h-screen w-full bg-[#050505] text-zinc-400 font-inter flex overflow-hidden"
+>
   <Sidebar
     {filteredNotes}
     bind:searchQuery
@@ -137,7 +139,12 @@
         <div class="text-center">
           <FileText size={48} class="mx-auto mb-4 opacity-20" />
           <p>No note selected</p>
-          <Button variant="outline" size="sm" class="mt-4" onclick={createNewNote}>Create New Note</Button>
+          <Button
+            variant="outline"
+            size="sm"
+            class="mt-4"
+            onclick={createNewNote}>Create New Note</Button
+          >
         </div>
       </div>
     {/if}
@@ -145,16 +152,56 @@
 </div>
 
 <style>
-  :global(.prose) { font-family: 'Inter', sans-serif; color: #a1a1aa; }
-  :global(.prose h1) { color: white; font-size: 2rem; font-weight: 800; margin-bottom: 1.5rem; }
-  :global(.prose h2) { color: white; font-size: 1.5rem; font-weight: 700; margin-top: 2rem; }
-  :global(.prose p) { margin-bottom: 1.25rem; line-height: 1.8; }
-  :global(.prose code) { background: rgba(255, 255, 255, 0.05); padding: 0.2rem 0.4rem; border-radius: 4px; color: #e2e2e2; }
-  :global(.prose pre) { background: #0c0c0c; padding: 1rem; border-radius: 8px; border: 1px solid rgba(255,255,255,0.05); overflow-x: auto; }
-  
-  ::-webkit-scrollbar { width: 6px; }
-  ::-webkit-scrollbar-track { background: transparent; }
-  ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.05); border-radius: 10px; }
-  ::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.1); }
-  :global(body) { background: #050505; margin: 0; overflow: hidden; }
+  :global(.prose) {
+    font-family: "Inter", sans-serif;
+    color: #a1a1aa;
+  }
+  :global(.prose h1) {
+    color: white;
+    font-size: 2rem;
+    font-weight: 800;
+    margin-bottom: 1.5rem;
+  }
+  :global(.prose h2) {
+    color: white;
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-top: 2rem;
+  }
+  :global(.prose p) {
+    margin-bottom: 1.25rem;
+    line-height: 1.8;
+  }
+  :global(.prose code) {
+    background: rgba(255, 255, 255, 0.05);
+    padding: 0.2rem 0.4rem;
+    border-radius: 4px;
+    color: #e2e2e2;
+  }
+  :global(.prose pre) {
+    background: #0c0c0c;
+    padding: 1rem;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    overflow-x: auto;
+  }
+
+  ::-webkit-scrollbar {
+    width: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.1);
+  }
+  :global(body) {
+    background: #050505;
+    margin: 0;
+    overflow: hidden;
+  }
 </style>
